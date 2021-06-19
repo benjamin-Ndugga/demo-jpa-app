@@ -2,7 +2,6 @@ package com.flyhub.demo.controllers;
 
 import com.flyhub.demo.services.AppRoleService;
 import com.flyhub.demo.models.OperationResult;
-import com.flyhub.demo.services.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
