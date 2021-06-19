@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  *
  * @author Benjamin E Ndugga
  */
+@Log4j2
 @Controller
 @RequestMapping("/api/v1/appuser")
 public class AppUserController {
@@ -31,6 +32,7 @@ public class AppUserController {
     @ResponseBody
     @GetMapping(produces = {"application/json"})
     public ResponseEntity<OperationResult> listAllUsers() {
+        log.info(String.format("Principle: %s", SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
         return new ResponseEntity<>(appUserService.listAllUsers(), HttpStatus.OK);
     }
 

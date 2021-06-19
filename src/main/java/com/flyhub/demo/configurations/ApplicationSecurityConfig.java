@@ -50,15 +50,17 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/v1/public/**").permitAll()
                 .antMatchers("/swagger**", "/swagger-resources/**", "/v2/api**", "/webjars/**").permitAll()
                 //closed and private endpoints
-                .antMatchers(HttpMethod.GET,"/api/v1/appuser**").hasAnyAuthority("SUPER_ADMIN", "ADMIN", "USER")
-                .antMatchers(HttpMethod.PUT,"/api/v1/appuser/addroles").hasAnyRole("SUPER_ADMIN", "ADMIN")
-                .antMatchers(HttpMethod.GET,"/api/v1/approle/**").hasAnyRole("SUPER_ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/v1/appuser**").hasAnyAuthority("SUPER_ADMIN", "ADMIN", "USER")
+                .antMatchers(HttpMethod.PUT, "/api/v1/appuser/addroles").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/v1/approle/**").hasAnyRole("SUPER_ADMIN")
                 .anyRequest().authenticated()
                 .and();
         //set a function to delete the cookie on logout
         http = http.logout().deleteCookies("JSESSIONID").and();
-        //set the authentication to form login
-        http.formLogin();
+        //set the authentication to httpbasic login
+        http.httpBasic()
+                .realmName("demo app");
+
     }
 
     /**
