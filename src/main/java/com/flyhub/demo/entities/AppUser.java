@@ -1,5 +1,7 @@
 package com.flyhub.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.Column;
@@ -20,6 +22,7 @@ import javax.persistence.Table;
  */
 @Entity(name = "AppUser")
 @Table(name = "app_users")
+@JsonIgnoreProperties(allowSetters = true, allowGetters = false, value = {"password"})
 public class AppUser implements Serializable {
 
     @Id
@@ -47,6 +50,17 @@ public class AppUser implements Serializable {
         this.username = username;
         this.password = password;
     }
+
+    public AppUser(String username, String password, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled) {
+        this.username = username;
+        this.password = password;
+        this.accountNonExpired = accountNonExpired;
+        this.accountNonLocked = accountNonLocked;
+        this.credentialsNonExpired = credentialsNonExpired;
+        this.enabled = enabled;
+    }
+    
+    
 
     public Long getUserId() {
         return userId;

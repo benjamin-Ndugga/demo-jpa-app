@@ -19,7 +19,7 @@ import org.springframework.util.Assert;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
-class RepositoriesTestClass {
+public class RepositoriesTestClass {
 
     @Autowired
     private AppUserRepository appUserRepository;

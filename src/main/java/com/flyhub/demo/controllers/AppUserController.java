@@ -3,12 +3,16 @@ package com.flyhub.demo.controllers;
 import com.flyhub.demo.models.OperationResult;
 import com.flyhub.demo.services.AppUserService;
 import java.util.List;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -37,7 +41,7 @@ public class AppUserController {
     }
 
     @ResponseBody
-    @GetMapping(path = "/addroles/{username}", produces = {"application/json"})
+    @PutMapping(path = "/addroles/{username}", produces = {"application/json"})
     public ResponseEntity<OperationResult> assignUserToRole(@PathVariable(name = "username") String username, @RequestBody List<String> rolenames) {
         return new ResponseEntity<>(appUserService.assignRoles(username, rolenames), HttpStatus.OK);
     }
