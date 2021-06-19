@@ -1,6 +1,7 @@
 package com.flyhub.demo.configurations;
 
 import com.flyhub.demo.authentication.AppUserDetailsService;
+import com.flyhub.demo.security.JwtTokenAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +11,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -25,11 +28,13 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder encoder;
     private final AppUserDetailsService appUserDetailsService;
+    private final JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter;
 
     @Autowired
-    public ApplicationSecurityConfig(PasswordEncoder encoder, AppUserDetailsService appUserDetailsService) {
+    public ApplicationSecurityConfig(PasswordEncoder encoder, AppUserDetailsService appUserDetailsService, JwtTokenAuthenticationFilter jwtTokenAuthenticationFilter) {
         this.encoder = encoder;
         this.appUserDetailsService = appUserDetailsService;
+        this.jwtTokenAuthenticationFilter = jwtTokenAuthenticationFilter;
     }
 
     @Override
@@ -43,11 +48,17 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         //enbale CORS and disable CSRF
         http = http.cors().and().csrf().disable();
 
+        //set the session management to stateless
+        http = http
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and();
+
         //set permissions
         http = http.authorizeRequests()
                 //open and public endpoints
-                .antMatchers("/css/*", "/js/*", "/login", "/logout", "/actuator/**").permitAll()
                 .antMatchers("/api/v1/public/**").permitAll()
+                .antMatchers("/css/*", "/js/*", "/login", "/logout", "/actuator/**").permitAll()
                 .antMatchers("/swagger**", "/swagger-resources/**", "/v2/api**", "/webjars/**").permitAll()
                 //closed and private endpoints
                 .antMatchers(HttpMethod.GET, "/api/v1/appuser**").hasAnyAuthority("SUPER_ADMIN", "ADMIN", "USER")
@@ -55,11 +66,9 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/v1/approle/**").hasAnyRole("SUPER_ADMIN")
                 .anyRequest().authenticated()
                 .and();
-        //set a function to delete the cookie on logout
-        http = http.logout().deleteCookies("JSESSIONID").and();
-        //set the authentication to httpbasic login
-        http.httpBasic()
-                .realmName("demo app");
+
+        // JwtTokenFilter before the Spring Security internal UsernamePasswordAuthenticationFilter
+        http.addFilterBefore(jwtTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     }
 
